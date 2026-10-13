@@ -4,7 +4,7 @@
 
 Built in 5 hours as an extension to [SaaSquatch Leads](https://www.saasquatchleads.com/) for the Caprae Capital challenge. Approach: **quality first**.
 
-- **Video walkthrough:** _add link_
+- **Video walkthrough:** [Watch on Loom](https://www.loom.com/share/d24d7aaefaf5471a86ab6845ce8d2cde)
 - **Live demo:** [saasquatch-lead-scorer.vercel.app](https://saasquatch-lead-scorer.vercel.app/)
 
 ## Why this feature
@@ -85,7 +85,7 @@ npm run db:push              # creates the local SQLite schema
 npm run dev                  # http://localhost:3000
 ```
 
-Try **Auto repair** + **Columbus, OH**, or open **Import a list** → **Load sample list**.
+Try **Auto repair** + **Columbus, OH**, or open **Import a list** → **Try sample list**.
 
 | Variable | Description |
 | --- | --- |
