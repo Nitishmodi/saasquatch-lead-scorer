@@ -5,7 +5,7 @@
 Built in 5 hours as an extension to [SaaSquatch Leads](https://www.saasquatchleads.com/) for the Caprae Capital challenge. Approach: **quality first**.
 
 - **Video walkthrough:** _add link_
-- **Live demo:** _add link_
+- **Live demo:** [saasquatch-lead-scorer.vercel.app](https://saasquatch-lead-scorer.vercel.app/)
 
 ## Why this feature
 

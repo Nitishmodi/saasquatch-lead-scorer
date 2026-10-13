@@ -5,7 +5,10 @@ import { USER_AGENT } from "@/lib/site";
 import type { DiscoveryResult } from "@/lib/types";
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const OVERPASS_MIRRORS = [
+  { url: "https://overpass-api.de/api/interpreter", timeoutMs: 20_000 },
+  { url: "https://overpass.private.coffee/api/interpreter", timeoutMs: 12_000 },
+];
 const SEARCH_RADIUS_M = 40_000;
 const MAX_COMPANIES = 30;
 const WEBSITE_KEYS = ["website", "contact:website"];
@@ -40,21 +43,22 @@ async function geocode(location: string): Promise<Place> {
   return { lat: Number(place.lat), lon: Number(place.lon), label: place.display_name };
 }
 
-async function queryOverpass(query: string, attempt = 1): Promise<OsmElement[]> {
-  const response = await fetch(OVERPASS_URL, {
-    method: "POST",
-    headers: { "user-agent": USER_AGENT, "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ data: query }),
-    signal: AbortSignal.timeout(30_000),
-  });
-
-  if ((response.status === 429 || response.status === 504) && attempt < 2) {
-    await sleep(2_000);
-    return queryOverpass(query, attempt + 1);
+async function queryOverpass(query: string): Promise<OsmElement[]> {
+  for (const [index, { url, timeoutMs }] of OVERPASS_MIRRORS.entries()) {
+    if (index > 0) await sleep(500);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "user-agent": USER_AGENT, "content-type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ data: query }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (response.ok) return ((await response.json()) as { elements: OsmElement[] }).elements;
+    } catch {
+      continue;
+    }
   }
-  if (!response.ok) throw new DiscoveryError("The business directory is busy. Try again in a few seconds.", 503);
-
-  return ((await response.json()) as { elements: OsmElement[] }).elements;
+  throw new DiscoveryError("The business directory is busy. Try again in a few seconds.", 503);
 }
 
 function buildQuery(industry: Industry, { lat, lon }: Place): string {
